@@ -1,52 +1,67 @@
 # 📊 Proyecto: Preparación y Modelado de Datos de Ventas (ETL)
 
 ## 👤 Autor
-* **Nombre:** Paula Florencia Cordero Lapalma
+* **Estudiante:** Paula Florencia Cordero Lapalma
+* **Curso:** Data Analytics / Power BI (Coderhouse)
 
 ---
 
-## 🎯 Propósito del Ejercicio
-Este proyecto simula el rol de un analista de datos junior enfrentándose a un reporte de ventas desorganizado proveniente de un sistema *legacy*. El objetivo principal fue aplicar un proceso completo de **ETL (Extracción, Transformación y Carga)** en Power Query y estructurar un modelo relacional eficiente en Power BI Desktop, garantizando la calidad, integridad y optimización de los datos para la futura construcción de visualizaciones y reportería analítica.
+## 📂 Estructura del Repositorio y Archivos Entregados
+Este repositorio contiene todos los elementos técnicos solicitados por la consigna del proyecto:
+* `README.md`: Documentación técnica detallada del proceso ETL y modelado.
+* Carpeta de evidencias y capturas del proceso en Power Query y Power BI.
+* Archivo fuente procesado y estructurado para el análisis.
+
+---
+
+## ⚙️ Instrucciones de Ejecución y Verificación
+Para verificar el funcionamiento y la correcta aplicación de los criterios de la rúbrica, siga estos pasos:
+1. **Clonar o descargar** este repositorio en su equipo local.
+2. Abrir **Power BI Desktop**.
+3. Cargar el archivo de datos correspondiente (`Ventas_export_legacy.xlsx`) o revisar las consultas conectadas.
+4. Ingresar al **Editor de Power Query** para visualizar la secuencia de pasos aplicados (Promoción de encabezados, tipado de datos, eliminación de nulos y duplicados).
+5. Dirigirse a la vista de **Modelo** en Power BI para comprobar el esquema en estrella y la relación de uno a varios (`1 a *`) establecida a través de la clave foránea `id_cliente`.
 
 ---
 
 ## 🛠️ 1. Extracción y Transformación de Datos en Power Query
 
-El archivo fuente `Ventas_export_legacy.xlsx` presentaba desafíos típicos de sistemas heredados: filas vacías, duplicados, inconsistencias de mayúsculas en categorías, fechas como texto y datos de clientes mezclados con los detalles de transacciones. 
+El archivo fuente presentaba desafíos típicos de sistemas heredados: filas vacías, duplicados, inconsistencias de mayúsculas en categorías, fechas como texto y datos de clientes mezclados con transacciones. 
 
 ### Secuencia de Pasos Aplicados:
-1. **Promoción de Encabezados:** Se elevó la primera fila para establecer los nombres correctos de los campos mediante la opción de promoción de datos.
-2. **Eliminación de Filas Vacías:** Se descartaron las filas iniciales/finales completamente vacías que no aportaban valor analítico.
-3. **Renombrado de Columnas:** Se estandarizaron todos los nombres técnicos originales (`COD_OP`, `COD_CLI`, etc.) a formato **`snake_case`** y en español (`id_operacion`, `id_cliente`, `nombre_cliente`, etc.) para asegurar una lectura intuitiva para los usuarios del negocio.
+1. **Promoción de Encabezados:** Se elevó la primera fila para establecer los nombres correctos de los campos.
+2. **Eliminación de Filas Vacías:** Se descartaron las filas iniciales/finales completamente vacías.
+3. **Renombrado de Columnas:** Estandarización de nombres técnicos (`COD_OP`, `COD_CLI`, etc.) a formato **`snake_case`** en español (`id_operacion`, `id_cliente`, etc.).
 4. **Corrección de Tipos de Datos:** 
-   * Se asignó tipo **Fecha** a las columnas temporales (`fecha_venta`, `fecha_alta_cliente`) para permitir filtros y cálculos de inteligencia de tiempo en DAX.
-   * Se configuraron los identificadores y números de contacto (`id_operacion`, `id_cliente`, `telefono_cliente`) como **Texto** para proteger los ceros iniciales y evitar conversiones numéricas no deseadas.
-   * Se ajustaron los montos y cantidades a formatos numéricos decimales y enteros.
-5. **Limpieza de Duplicados y Nulos:** Se eliminaron las filas duplicadas basándose en la clave única de la operación y se gestionaron los valores nulos para evitar sesgos en las métricas.
-6. **Estandarización de Textos:** Se unificaron las variantes de mayúsculas/minúsculas en el campo de canal de ventas (`canal_venta`) para evitar la fragmentación de categorías en los gráficos.
+   * Asignación de tipo **Fecha** a las columnas temporales (`fecha_venta`, `fecha_alta_cliente`).
+   * Configuración de identificadores y números de contacto (`id_operacion`, `id_cliente`, `telefono_cliente`) como **Texto**.
+   * Ajuste de montos y cantidades a formatos numéricos.
+5. **Limpieza de Duplicados y Nulos:** Eliminación de filas duplicadas basándose en la clave única de la operación y gestión de nulos.
+6. **Estandarización de Textos:** Unificación de mayúsculas/minúsculas en el campo `canal_venta`.
 
-<img width="1910" height="832" alt="Captura de pantalla 2026-10-15 162532" src="https://github.com/user-attachments/assets/4ca0579f-2cb2-41c3-a37d-af7f1dadbb89" />
-
+> 📸 **Evidencia del panel de "Pasos Aplicados" en Power Query:**
+<img width="1910" height="832" alt="Captura de pantalla 2026-10-15 162532" src="https://github.com/user-attachments/assets/f4698e87-c1f4-4829-bb8e-27fda73e5c98" />
 
 ---
 
 ## 🗂️ 2. Normalización y Modelado Dimensional (Esquema en Estrella)
 
-Para cumplir con las mejores prácticas de modelado de datos y evitar la redundancia (anomalías de actualización), se separó la información transaccional de la información de los clientes mediante el siguiente diseño:
-
-* **Dimensión Clientes (`dim_clientes`):** Se duplicó la consulta original, filtrando únicamente los atributos correspondientes al cliente y aplicando la eliminación de duplicados sobre el campo `id_cliente` para garantizar una dimensión única donde cada cliente aparece una sola vez.
-* **Tabla de Hechos (`hechos_ventas`):** Se conservó el detalle transaccional de las operaciones eliminando las columnas de datos personales redundantes, manteniendo únicamente la columna `id_cliente` como **clave foránea**.
+Para cumplir con las mejores prácticas de modelado de datos y evitar redundancias:
+* **Dimensión Clientes (`dim_clientes`):** Se duplicó la consulta original, filtrando únicamente los atributos del cliente y aplicando eliminación de duplicados sobre `id_cliente`.
+* **Tabla de Hechos (`hechos_ventas`):** Se conservó el detalle transaccional eliminando columnas personales redundantes y manteniendo `id_cliente` como **clave foránea**.
 
 ### Relación en Power BI:
-Ambas tablas se conectaron en la vista de modelo de Power BI Desktop mediante una relación de **uno a varios (`1 a *`)** utilizando `id_cliente` como puente, asegurando que los filtros fluyan correctamente desde la dimensión hacia los hechos.
+Ambas tablas se conectaron mediante una relación de **uno a varios (`1 a *`)** utilizando `id_cliente` como puente.
 
-> 📸 **Captura del Modelo Relacional:**
+> 📸 **Evidencia del Modelo Relacional:**
+<img width="966" height="582" alt="Captura de pantalla 2026-10-15 162552" src="https://github.com/user-attachments/assets/1111da4d-55d1-4509-bd3b-4cf7a9793ba9" />
 
-<img width="966" height="582" alt="Captura de pantalla 2026-10-15 162552" src="https://github.com/user-attachments/assets/87587fee-7362-421f-85a9-e3819e67f91b" />
 
 ---
 
-## ✅ Conclusión y Criterios de Aceptación
-* El archivo se cargó exitosamente en Power BI Desktop sin errores de conversión.
+## ✅ Criterios de Aceptación Cumplidos
+* El archivo se cargó exitosamente en Power BI Desktop sin errores.
 * Se eliminaron por completo las filas vacías y duplicadas.
-* El modelo resultante en esquema de estrella optimiza el rendimiento del motor **VertiPaq** y deja los datos listos para el desarrollo de medidas DAX avanzadas y tableros de control ejecutivos.
+* El modelo en esquema de estrella optimiza el rendimiento del motor **VertiPaq**.
+
+
